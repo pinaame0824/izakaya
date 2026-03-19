@@ -28,6 +28,8 @@ const Admin = () => {
     const [menus, setMenus] = useState<GroupedMenus>({});
     const [loading, setLoading] = useState(true);
     const [toast, setToast] = useState<string | null>(null);
+    const [password, setPassword] = useState<string>('');
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
     useEffect(() => {
         fetchMenus();
@@ -65,9 +67,18 @@ const Admin = () => {
         try {
             const response = await fetch(`${API_BASE_URL}/api/menus/${id}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Admin-Password': password
+                },
                 body: JSON.stringify({ name: item.name, price: item.price })
             });
+
+            if (response.status === 401) {
+                alert('認証エラー: パスワードが正しくありません');
+                setIsAuthenticated(false);
+                return;
+            }
 
             const result = await response.json();
             if (result.success) {
@@ -85,6 +96,30 @@ const Admin = () => {
         setToast(msg);
         setTimeout(() => setToast(null), 3000);
     };
+
+    if (!isAuthenticated) {
+        return (
+            <div className="admin-page" style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-dark)' }}>
+                <div style={{ background: 'white', padding: '40px', borderRadius: '8px', boxShadow: '0 4px 20px rgba(0,0,0,0.3)', width: '100%', maxWidth: '400px' }}>
+                    <h2 style={{ marginBottom: '20px', textAlign: 'center' }}>管理者ログイン</h2>
+                    <input
+                        type="password"
+                        placeholder="管理者パスワード"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && setIsAuthenticated(true)}
+                        style={{ width: '100%', padding: '12px', marginBottom: '20px', border: '1px solid #ddd', borderRadius: '4px' }}
+                    />
+                    <button
+                        onClick={() => setIsAuthenticated(true)}
+                        style={{ width: '100%', padding: '12px', background: 'var(--primary-color)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+                    >
+                        ログイン
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     if (loading) {
         return <div className="section container text-center">読み込み中...</div>;
@@ -181,7 +216,10 @@ const Admin = () => {
             `}</style>
 
             <div className="admin-container">
-                <h1>メニュー管理画面</h1>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                    <h1>メニュー管理画面</h1>
+                    <button onClick={() => setIsAuthenticated(false)} style={{ background: '#eee', border: 'none', padding: '5px 15px', borderRadius: '4px', cursor: 'pointer' }}>ログアウト</button>
+                </div>
                 <p>商品名や価格を変更し「更新」ボタンを押してください。</p>
 
                 {categoryOrder.map(catKey => {

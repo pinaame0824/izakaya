@@ -1,14 +1,33 @@
 import 'dotenv/config';
-import express, { Request, Response } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import mysql, { RowDataPacket, ResultSetHeader } from 'mysql2';
 import cors from 'cors';
+import helmet from 'helmet';
 import path from 'path';
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// CORSの設定 (全てのオリジンまたは特定のドメインを許可)
-app.use(cors());
+// セキュリティヘッダーの設定
+app.use(helmet());
+
+// CORSの設定
+const allowedOrigins = [
+    process.env.FRONTEND_URL,
+    'http://localhost:5173', // Vite 開発環境
+    'http://localhost:3000'
+].filter(Boolean) as string[];
+
+app.use(cors({
+    origin: (origin, callback) => {
+        // originが未定義（自分のサーバー内など）または許可リストに含まれる場合
+        if (!origin || allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV !== 'production') {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    }
+}));
 
 // JSONボディのパース
 app.use(express.json());
@@ -27,11 +46,29 @@ const connection = mysql.createConnection({
 
 connection.connect((err) => {
     if (err) {
-        console.error('Database connection failed: ' + err.stack);
+        console.error('Database connection failed');
         return;
     }
     console.log('Connected to MySQL database.');
 });
+
+// 管理者認証ミドルウェア
+const adminAuth = (req: Request, res: Response, next: NextFunction) => {
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    const providedPassword = req.headers['x-admin-password'];
+
+    if (!adminPassword) {
+        // パスワードが環境変数に設定されていない場合は、セキュリティのため全ての変更を拒否
+        console.warn('ADMIN_PASSWORD is not set in environment variables.');
+        return res.status(500).json({ success: false, message: 'Server configuration error' });
+    }
+
+    if (providedPassword === adminPassword) {
+        next();
+    } else {
+        res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+};
 
 // 型定義
 interface MenuItem extends RowDataPacket {
@@ -61,7 +98,6 @@ interface ReservationRequestBody {
 app.post('/api/reservations', (req: Request<{}, {}, ReservationRequestBody>, res: Response) => {
     const { date, time, people, course, name, tel, email, message } = req.body;
 
-    // バリデーション（簡易）
     if (!date || !time || !people || !name || !tel) {
         res.status(400).json({ success: false, message: '必須項目が不足しています' });
         return;
@@ -72,18 +108,16 @@ app.post('/api/reservations', (req: Request<{}, {}, ReservationRequestBody>, res
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
-    // 数値変換
-    // req.body.people は string または number の可能性があるため変換
     let peopleCount = typeof people === 'string' ? parseInt(people, 10) : people;
     if (isNaN(peopleCount)) peopleCount = 1;
 
-    connection.query<ResultSetHeader>(query, [date, time, peopleCount, course, name, tel, email, message], (error, results) => {
+    connection.query<ResultSetHeader>(query, [date, time, peopleCount, course, name, tel, email, message], (error) => {
         if (error) {
-            console.error('Error saving reservation:', error);
+            console.error('Error saving reservation');
             res.status(500).json({ success: false, message: '予約の保存に失敗しました' });
             return;
         }
-        res.json({ success: true, message: '予約を受け付けました', id: results.insertId });
+        res.json({ success: true, message: '予約を受け付けました' });
     });
 });
 
@@ -91,16 +125,13 @@ app.post('/api/reservations', (req: Request<{}, {}, ReservationRequestBody>, res
 app.get('/api/menus', (req: Request, res: Response) => {
     const query = 'SELECT * FROM menus WHERE is_available = TRUE ORDER BY id ASC';
 
-    // ジェネリクス <MenuItem[]> を指定して結果の型を定義
     connection.query<MenuItem[]>(query, (error, results) => {
         if (error) {
-            console.error('Error fetching menus:', error);
+            console.error('Error fetching menus');
             res.status(500).json({ success: false, message: 'メニューの取得に失敗しました' });
             return;
         }
 
-        // カテゴリーごとにグループ化
-        // 戻り値の型は { [key: string]: MenuItem[] }
         const groupedMenus = results.reduce<{ [key: string]: MenuItem[] }>((acc, item) => {
             if (!acc[item.category]) {
                 acc[item.category] = [];
@@ -113,8 +144,8 @@ app.get('/api/menus', (req: Request, res: Response) => {
     });
 });
 
-// API: メニュー更新
-app.put('/api/menus/:id', (req: Request, res: Response) => {
+// API: メニュー更新（認証が必要）
+app.put('/api/menus/:id', adminAuth, (req: Request, res: Response) => {
     const id = req.params.id;
     const { name, price } = req.body;
 
@@ -124,9 +155,9 @@ app.put('/api/menus/:id', (req: Request, res: Response) => {
     }
 
     const query = 'UPDATE menus SET name = ?, price = ? WHERE id = ?';
-    connection.query<ResultSetHeader>(query, [name, price, id], (error, results) => {
+    connection.query<ResultSetHeader>(query, [name, price, id], (error) => {
         if (error) {
-            console.error('Error updating menu:', error);
+            console.error('Error updating menu');
             res.status(500).json({ success: false, message: 'メニューの更新に失敗しました' });
             return;
         }
@@ -143,6 +174,10 @@ app.get('/api/health', (req: Request, res: Response) => {
         }
         res.json({ status: 'ok' });
     });
+});
+
+app.get('/', (req, res) => {
+    res.send('Izakaya Kagaribi API Server');
 });
 
 app.listen(port, () => {
