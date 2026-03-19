@@ -1,10 +1,14 @@
 import 'dotenv/config';
 import express, { Request, Response } from 'express';
 import mysql, { RowDataPacket, ResultSetHeader } from 'mysql2';
+import cors from 'cors';
 import path from 'path';
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+// CORSの設定 (全てのオリジンまたは特定のドメインを許可)
+app.use(cors());
 
 // JSONボディのパース
 app.use(express.json());
