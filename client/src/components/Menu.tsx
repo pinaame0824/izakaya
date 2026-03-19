@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import API_BASE_URL from '../config';
 
 interface MenuItem {
     id: number;
@@ -31,7 +32,7 @@ const Menu = () => {
     useEffect(() => {
         const fetchMenus = async () => {
             try {
-                const response = await fetch('/api/menus');
+                const response = await fetch(`${API_BASE_URL}/api/menus`);
                 const data = await response.json();
                 if (data.success) {
                     setMenus(data.menus);

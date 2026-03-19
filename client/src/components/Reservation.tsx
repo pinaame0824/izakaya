@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import API_BASE_URL from '../config';
 
 const Reservation = () => {
     const [isFormVisible, setIsFormVisible] = useState(false);
@@ -24,7 +25,7 @@ const Reservation = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            const response = await fetch('/api/reservations', {
+            const response = await fetch(`${API_BASE_URL}/api/reservations`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import API_BASE_URL from '../config';
 
 interface MenuItem {
     id: number;
@@ -34,7 +35,7 @@ const Admin = () => {
 
     const fetchMenus = async () => {
         try {
-            const response = await fetch('/api/menus');
+            const response = await fetch(`${API_BASE_URL}/api/menus`);
             const data = await response.json();
             if (data.success) {
                 setMenus(data.menus);
@@ -62,7 +63,7 @@ const Admin = () => {
         if (!item) return;
 
         try {
-            const response = await fetch(`/api/menus/${id}`, {
+            const response = await fetch(`${API_BASE_URL}/api/menus/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: item.name, price: item.price })
