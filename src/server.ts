@@ -37,12 +37,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
 
 // MySQL接続設定
-const connection = mysql.createConnection({
+const dbConfig: any = process.env.DATABASE_URL || process.env.MYSQL_URL || {
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || '',
     database: process.env.DB_NAME || 'izakaya_kagaribi'
-});
+};
+
+const connection = mysql.createConnection(dbConfig);
 
 connection.connect((err) => {
     if (err) {
