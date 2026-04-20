@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { menuData, MenuItem } from '../data/menuData';
+import { menuData } from '../data/menuData';
+import type { MenuItem } from '../data/menuData';
 
 interface GroupedMenus {
     [key: string]: MenuItem[];
