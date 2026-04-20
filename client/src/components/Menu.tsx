@@ -1,13 +1,5 @@
 import { useState, useEffect } from 'react';
-import API_BASE_URL from '../config';
-
-interface MenuItem {
-    id: number;
-    name: string;
-    price: number;
-    category: string;
-    description: string;
-}
+import { menuData, MenuItem } from '../data/menuData';
 
 interface GroupedMenus {
     [key: string]: MenuItem[];
@@ -30,20 +22,19 @@ const Menu = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchMenus = async () => {
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/menus`);
-                const data = await response.json();
-                if (data.success) {
-                    setMenus(data.menus);
+        // 静的データを使用してグループ化
+        const grouped = menuData.reduce<{ [key: string]: MenuItem[] }>((acc, item) => {
+            if (item.is_available !== false) {
+                if (!acc[item.category]) {
+                    acc[item.category] = [];
                 }
-            } catch (error) {
-                console.error('Error fetching menus:', error);
-            } finally {
-                setLoading(false);
+                acc[item.category].push(item);
             }
-        };
-        fetchMenus();
+            return acc;
+        }, {});
+
+        setMenus(grouped);
+        setLoading(false);
     }, []);
 
     if (loading) {

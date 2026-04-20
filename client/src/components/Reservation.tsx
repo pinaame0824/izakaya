@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import API_BASE_URL from '../config';
 
 const Reservation = () => {
     const [isFormVisible, setIsFormVisible] = useState(false);
@@ -24,22 +23,14 @@ const Reservation = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
+        
+        // 開発・デモ用のダミー待機（Firebaseなし）
         try {
-            const response = await fetch(`${API_BASE_URL}/api/reservations`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
-            });
-            const result = await response.json();
-            if (result.success) {
-                setSubmitted(true);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            } else {
-                alert('予約に失敗しました: ' + result.message);
-            }
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            setSubmitted(true);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (error) {
-            console.error('Error submitting reservation:', error);
-            alert('接続エラーが発生しました。');
+            console.error('Submission error:', error);
         } finally {
             setLoading(false);
         }

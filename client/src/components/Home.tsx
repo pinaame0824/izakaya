@@ -125,10 +125,16 @@ const Home = () => {
                         </table>
                     </div>
                     <div className="map-wrapper active">
-                        <div className="map-placeholder">
-                            <span>MAP</span>
-                            <p>渋谷駅より徒歩5分</p>
-                        </div>
+                        <iframe
+                            src="https://maps.google.co.jp/maps?output=embed&q=東京都渋谷区神宮前1-2-3"
+                            width="100%"
+                            height="100%"
+                            style={{ border: 0, minHeight: "350px", width: "100%", display: "block" }}
+                            allowFullScreen={true}
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                            title="Google Maps"
+                        ></iframe>
                     </div>
                 </div>
             </section>

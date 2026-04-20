@@ -1,3 +1,0 @@
-# Netlify Redirects for API Proxy
-/api/*  https://imaginative-trust-production-6549.up.railway.app/api/:splat  200
-/*      /index.html  200
