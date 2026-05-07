@@ -134,6 +134,14 @@ const Menu = () => {
                     font-size: 20px;
                     margin-left: 20px;
                 }
+                .menu-footer-note {
+                    margin-top: 80px;
+                    padding-top: 40px;
+                    border-top: 1px solid rgba(0,0,0,0.1);
+                    font-size: 14px;
+                    color: #666;
+                    line-height: 1.8;
+                }
                 @media (max-width: 991px) {
                     .menu-list {
                         grid-template-columns: 1fr;
@@ -174,6 +182,12 @@ const Menu = () => {
                             </div>
                         );
                     })}
+                    <div className="menu-footer-note">
+                        <p>※ 表示価格はすべて税込価格です。</p>
+                        <p>※ 20歳未満の飲酒は法律で禁止されています。年齢確認をさせていただく場合がございます。</p>
+                        <p>※ お車を運転される方、妊娠中や授乳期の方へのアルコール提供はお断りしております。</p>
+                        <p>※ 写真はイメージです。仕入れ状況により内容が変更になる場合がございます。</p>
+                    </div>
                 </div>
             </div>
         </div>

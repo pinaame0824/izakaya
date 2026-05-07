@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const Reservation = () => {
-    const [isFormVisible, setIsFormVisible] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [agreed, setAgreed] = useState(false);
+    const [isAdult, setIsAdult] = useState(false);
     const [formData, setFormData] = useState({
         date: '',
         time: '',
@@ -22,6 +24,10 @@ const Reservation = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!agreed || !isAdult) {
+            alert('規約への同意と成人確認が必要です。');
+            return;
+        }
         setLoading(true);
         
         // 開発・デモ用のダミー待機（Firebaseなし）
@@ -71,16 +77,6 @@ const Reservation = () => {
                     margin-bottom: 20px;
                     font-family: var(--font-serif);
                 }
-                .res-intro {
-                    margin-bottom: 40px;
-                }
-                .res-actions {
-                    display: flex;
-                    justify-content: center;
-                    gap: 30px;
-                    margin-top: 40px;
-                    transition: var(--transition);
-                }
                 
                 /* Form Styles */
                 .reservation-form {
@@ -127,97 +123,118 @@ const Reservation = () => {
                     border-color: var(--primary-color);
                     background: rgba(0, 0, 0, 0.7);
                 }
+                .checkbox-group {
+                    margin-top: 30px;
+                    padding-top: 20px;
+                    border-top: 1px solid rgba(255,255,255,0.1);
+                }
+                .checkbox-item {
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 10px;
+                    margin-bottom: 15px;
+                    cursor: pointer;
+                }
+                .checkbox-item input {
+                    width: 18px;
+                    height: 18px;
+                    margin-top: 2px;
+                    cursor: pointer;
+                }
+                .checkbox-label {
+                    font-size: 14px;
+                    color: white;
+                    opacity: 0.9;
+                    letter-spacing: 0;
+                }
+                .checkbox-label a {
+                    color: var(--primary-color);
+                    text-decoration: underline;
+                }
                 .submit-btn {
                     width: 100%;
                     margin-top: 20px;
                 }
-                .back-link {
-                    display: block;
-                    margin-top: 20px;
-                    text-align: center;
-                    font-size: 14px;
-                    opacity: 0.7;
-                    cursor: pointer;
+                .submit-btn:disabled {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                    background: #555;
+                    border-color: #555;
                 }
-                .back-link:hover { opacity: 1; color: var(--primary-color); }
 
                 @media (max-width: 768px) {
-                    .res-actions { flex-direction: column; }
                     .form-row { grid-template-columns: 1fr; }
                     .reservation-form { padding: 30px 20px; }
                 }
             `}</style>
 
             <div className="container reservation-container">
-                {!isFormVisible ? (
-                    <div className="res-intro">
-                        <span className="sub-title text-gold">RESERVATION</span>
-                        <h2>ご予約</h2>
-                        <p className="opacity-8">お電話またはWebよりご予約を承っております。</p>
-                        <div className="res-actions">
-                            <a href="tel:00-0000-0000" className="btn btn-outline text-white">
-                                <span style={{ display: 'block', fontSize: '12px', opacity: 0.7 }}>お電話で予約</span>
-                                00-0000-0000
-                            </a>
-                            <button className="btn btn-gold" onClick={() => setIsFormVisible(true)}>
-                                Webで予約する
-                            </button>
+                <div className="reservation-form">
+                    <h2 className="text-center" style={{ fontSize: '24px', marginBottom: '10px', borderBottom: '1px solid rgba(212,175,55,0.2)', paddingBottom: '20px' }}>ご予約</h2>
+                    <p className="text-center opacity-8" style={{ marginBottom: '30px', fontSize: '14px' }}>必要事項をご入力ください。内容を確認後、担当者よりご連絡いたします。</p>
+                    <form onSubmit={handleSubmit}>
+                        <div className="form-row">
+                            <div className="form-group">
+                                <label>ご来店日 *</label>
+                                <input type="date" name="date" required value={formData.date} onChange={handleInputChange} />
+                            </div>
+                            <div className="form-group">
+                                <label>ご来店時間 *</label>
+                                <input type="time" name="time" required value={formData.time} onChange={handleInputChange} />
+                            </div>
                         </div>
-                    </div>
-                ) : (
-                    <div className="reservation-form">
-                        <h2 className="text-center" style={{ fontSize: '24px', marginBottom: '40px', borderBottom: '1px solid rgba(212,175,55,0.2)', paddingBottom: '20px' }}>予約情報を入力してください</h2>
-                        <form onSubmit={handleSubmit}>
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>ご来店日 *</label>
-                                    <input type="date" name="date" required value={formData.date} onChange={handleInputChange} />
-                                </div>
-                                <div className="form-group">
-                                    <label>ご来店時間 *</label>
-                                    <input type="time" name="time" required value={formData.time} onChange={handleInputChange} />
-                                </div>
-                            </div>
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>人数 *</label>
-                                    <input type="number" name="people" min="1" max="20" required value={formData.people} onChange={handleInputChange} />
-                                </div>
-                                <div className="form-group">
-                                    <label>コース</label>
-                                    <select name="course" value={formData.course} onChange={handleInputChange}>
-                                        <option value="席のみ予約">席のみ予約</option>
-                                        <option value="【松】篝火特選コース">【松】篝火特選コース (¥8,000)</option>
-                                        <option value="【竹】旬の味覚コース">【竹】旬の味覚コース (¥6,000)</option>
-                                        <option value="【梅】定番おつまみコース">【梅】定番おつまみコース (¥4,500)</option>
-                                    </select>
-                                </div>
+                        <div className="form-row">
+                            <div className="form-group">
+                                <label>人数 *</label>
+                                <input type="number" name="people" min="1" max="20" required value={formData.people} onChange={handleInputChange} />
                             </div>
                             <div className="form-group">
-                                <label>お名前 *</label>
-                                <input type="text" name="name" placeholder="姓名 太郎" required value={formData.name} onChange={handleInputChange} />
+                                <label>コース</label>
+                                <select name="course" value={formData.course} onChange={handleInputChange}>
+                                    <option value="席のみ予約">席のみ予約</option>
+                                    <option value="【松】篝火特選コース">【松】篝火特選コース (¥8,000)</option>
+                                    <option value="【竹】旬の味覚コース">【竹】旬の味覚コース (¥6,000)</option>
+                                    <option value="【梅】定番おつまみコース">【梅】定番おつまみコース (¥4,500)</option>
+                                </select>
                             </div>
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>電話番号 *</label>
-                                    <input type="tel" name="tel" placeholder="090-0000-0000" required value={formData.tel} onChange={handleInputChange} />
-                                </div>
-                                <div className="form-group">
-                                    <label>メールアドレス *</label>
-                                    <input type="email" name="email" placeholder="example@mail.com" required value={formData.email} onChange={handleInputChange} />
-                                </div>
+                        </div>
+                        <div className="form-group">
+                            <label>お名前 *</label>
+                            <input type="text" name="name" placeholder="姓名 太郎" required value={formData.name} onChange={handleInputChange} />
+                        </div>
+                        <div className="form-row">
+                            <div className="form-group">
+                                <label>電話番号 *</label>
+                                <input type="tel" name="tel" placeholder="090-0000-0000" required value={formData.tel} onChange={handleInputChange} />
                             </div>
                             <div className="form-group">
-                                <label>ご要望・アレルギー等</label>
-                                <textarea name="message" rows={4} placeholder="アレルギーや記念日などのご要望がございましたらご記入ください" value={formData.message} onChange={handleInputChange}></textarea>
+                                <label>メールアドレス *</label>
+                                <input type="email" name="email" placeholder="example@mail.com" required value={formData.email} onChange={handleInputChange} />
                             </div>
-                            <button type="submit" className="btn btn-gold submit-btn" disabled={loading}>
-                                {loading ? '送信中...' : '予約を確定する'}
-                            </button>
-                            <span className="back-link" onClick={() => setIsFormVisible(false)}>前の画面に戻る</span>
-                        </form>
-                    </div>
-                )}
+                        </div>
+                        <div className="form-group">
+                            <label>ご要望・アレルギー等</label>
+                            <textarea name="message" rows={4} placeholder="アレルギーや記念日などのご要望がございましたらご記入ください" value={formData.message} onChange={handleInputChange}></textarea>
+                        </div>
+
+                        <div className="checkbox-group">
+                            <label className="checkbox-item">
+                                <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} required />
+                                <span className="checkbox-label">
+                                    <Link to="/terms" target="_blank">利用規約</Link>および<Link to="/privacy" target="_blank">プライバシーポリシー</Link>に同意する *
+                                </span>
+                            </label>
+                            <label className="checkbox-item">
+                                <input type="checkbox" checked={isAdult} onChange={(e) => setIsAdult(e.target.checked)} required />
+                                <span className="checkbox-label">私は20歳以上であり、同行者にも未成年は含まれません *</span>
+                            </label>
+                        </div>
+
+                        <button type="submit" className="btn btn-gold submit-btn" disabled={loading || !agreed || !isAdult}>
+                            {loading ? '送信中...' : '予約を確定する'}
+                        </button>
+                    </form>
+                </div>
             </div>
         </section>
     );
