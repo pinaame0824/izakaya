@@ -6,10 +6,6 @@ const Footer = () => {
             <div className="container">
                 <div className="footer-top">
                     <div className="footer-logo">篝火<span>KAGARIBI</span></div>
-                    <div className="footer-sns">
-                        <a href="#">Instagram</a>
-                        <a href="#">Facebook</a>
-                    </div>
                 </div>
                 <div className="footer-bottom">
                     <div className="footer-legal-warning" style={{ marginBottom: '20px', fontSize: '12px', opacity: 0.7, borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '20px' }}>
