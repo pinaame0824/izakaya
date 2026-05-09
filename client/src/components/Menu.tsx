@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { menuData } from '../data/menuData';
 import type { MenuItem } from '../data/menuData';
 
@@ -187,6 +188,9 @@ const Menu = () => {
                         <p>※ 20歳未満の飲酒は法律で禁止されています。年齢確認をさせていただく場合がございます。</p>
                         <p>※ お車を運転される方、妊娠中や授乳期の方へのアルコール提供はお断りしております。</p>
                         <p>※ 写真はイメージです。仕入れ状況により内容が変更になる場合がございます。</p>
+                    </div>
+                    <div style={{ textAlign: 'center', marginTop: '60px', paddingBottom: '20px' }}>
+                        <Link to="/" className="btn btn-outline">← トップページへ戻る</Link>
                     </div>
                 </div>
             </div>
