@@ -1,5 +1,7 @@
 
 
+import { Link } from 'react-router-dom';
+
 const PrivacyPolicy = () => {
   return (
     <div className="legal-page section bg-dark text-white">
@@ -56,6 +58,9 @@ const PrivacyPolicy = () => {
         電話番号：03-1234-5678</p>
 
         <p style={{ marginTop: '50px', textAlign: 'right' }}>以上</p>
+        <div style={{ marginTop: '50px', paddingBottom: '40px', textAlign: 'center' }}>
+          <Link to="/" className="btn btn-outline">← トップページへ戻る</Link>
+        </div>
       </div>
     </div>
   );

@@ -1,5 +1,7 @@
 
 
+import { Link } from 'react-router-dom';
+
 const TermsOfService = () => {
   return (
     <div className="legal-page section bg-dark text-white">
@@ -59,6 +61,9 @@ const TermsOfService = () => {
         <p>本規約の解釈にあたっては，日本法を準拠法とします。本サービスに関して紛争が生じた場合には，当店の本店所在地を管轄する裁判所を専属的合意管轄とします。</p>
 
         <p style={{ marginTop: '50px', textAlign: 'right' }}>以上</p>
+        <div style={{ marginTop: '50px', paddingBottom: '40px', textAlign: 'center' }}>
+          <Link to="/" className="btn btn-outline">← トップページへ戻る</Link>
+        </div>
       </div>
     </div>
   );
