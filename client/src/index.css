@@ -508,6 +508,36 @@ footer {
     .menu-grid { grid-template-columns: 1fr; }
     .res-actions { flex-direction: column; }
     .section { padding: 80px 0; }
+
+    /* フッター下部：スマホでは縦並び・中央揃え */
+    .footer-bottom {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 16px;
+    }
+    .footer-bottom > p {
+        order: 2;
+    }
+    .footer-bottom .footer-legal-warning {
+        order: 1;
+        margin-bottom: 0 !important;
+        border-top: none !important;
+        padding-top: 0 !important;
+        padding-bottom: 16px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        width: 100%;
+    }
+    .footer-nav {
+        order: 3;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+    }
+    .footer-nav a {
+        margin-left: 0;
+    }
 }
 
 /* Reveal Animations */
