@@ -142,7 +142,16 @@ const Home = () => {
             <section id="reservation" className="section reservation-section">
                 <div className="container text-center active">
                     <span className="sub-title text-gold">RESERVATION</span>
-                    <h2 className="text-white">ご予約・お問い合わせ</h2>
+                    <h2 className="text-white reservation-heading">ご予約<span className="heading-separator">・</span><span className="heading-break"><br /></span>お問い合わせ
+                        <style>{`
+                            .heading-separator { display: inline; }
+                            .heading-break { display: none; }
+                            @media (max-width: 768px) {
+                                .heading-separator { display: none; }
+                                .heading-break { display: inline; }
+                            }
+                        `}</style>
+                    </h2>
                     <p className="text-white opacity-8">お電話または24時間受付のネット予約より承っております。</p>
                     <div className="res-actions">
                         <a href="tel:0312345678" className="btn btn-primary">電話で予約する</a>
